@@ -38,7 +38,6 @@ const setCamera = (e, videoIndex=0) => {
       return device.kind === 'videoinput'
     })
 
-    console.log(videoIndex);
     let deviceId = videoInputs[videoIndex].deviceId
 
     playVideo(deviceId)
