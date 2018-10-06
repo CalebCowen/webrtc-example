@@ -1,20 +1,56 @@
-const constraints = {
-  video: { width: window.innerWidth, height: window.innerHeight }
-}
-
-const video = document.getElementById('video')
-
 const startButton = document.getElementById('start-button')
-navigator.mediaDevices.getUserMedia(constraints)
-.then((stream) => {
-  this.stream = stream
-  startButton.onclick = startVideo
-})
-.catch((err) => {
-  console.log(err);
-})
+const cameraOne = document.getElementById('camera-one')
+const cameraTwo = document.getElementById('camera-two')
 
-const startVideo = () => {
-  video.srcObject = this.stream
+
+const setVideoSrc = (stream) => {
+  const video = document.getElementById('video')
+
+  video.srcObject = stream
   video.play()
 }
+
+const playVideo = (deviceId) => {
+  startButton.hidden = true
+  cameraOne.hidden = false
+  cameraTwo.hidden = false
+
+  const constraints = {
+    video: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      deviceId
+    }
+  }
+
+  navigator.mediaDevices.getUserMedia(constraints)
+  .then((stream) => {
+    setVideoSrc(stream)
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
+
+const setCamera = (e, videoIndex=0) => {
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    let videoInputs = devices.filter((device) => {
+      return device.kind === 'videoinput'
+    })
+
+    console.log(videoIndex);
+    let deviceId = videoInputs[videoIndex].deviceId
+
+    playVideo(deviceId)
+  })
+}
+
+const switchCamera = (e) => {
+  cameraOne.disabled = !cameraOne.disabled
+  cameraTwo.disabled = !cameraTwo.disabled
+  setCamera(e, e.target.value - 1)
+}
+
+cameraOne.onclick = switchCamera
+cameraTwo.onclick = switchCamera
+startButton.onclick = setCamera
